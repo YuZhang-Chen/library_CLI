@@ -93,7 +93,7 @@
 
 ### 登入頁面
 ![登入頁面](./photo/login.png)
-![註冊頁面](./photo/registery.png)
+![註冊頁面](./photo/register.png)
 
 ### 一般使用者介面
 ![書籍列表](./photo/使用者介面.png)
