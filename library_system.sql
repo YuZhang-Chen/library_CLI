@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2025-12-16 10:54:45
+-- 產生時間： 2025-12-16 10:55:36
 -- 伺服器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -65,6 +65,52 @@ INSERT INTO `books` (`id`, `title`, `author`, `isbn`, `publisher`, `publication_
 (19, '房思琪的初戀樂園', '林奕含', '978-986-93582-7-5', '遊牧民', '2017', '在庫', '2025-12-16 09:04:44', '2025-12-16 09:24:08'),
 (20, '被討厭的勇氣', '岸見一郎, 古賀史健', '978-957-9164-92-1', '究竟出版', '2013', '在庫', '2025-12-16 09:04:44', '2025-12-16 09:04:44');
 
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `borrowing_records`
+--
+
+CREATE TABLE `borrowing_records` (
+  `id` int(11) NOT NULL COMMENT '借閱紀錄唯一ID',
+  `book_id` int(11) NOT NULL COMMENT '關聯的書籍ID',
+  `user_id` int(11) NOT NULL COMMENT '借閱人的使用者ID',
+  `borrow_date` timestamp NOT NULL DEFAULT current_timestamp() COMMENT '借出日期',
+  `due_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '應歸還日期',
+  `return_date` timestamp NULL DEFAULT NULL COMMENT '實際歸還日期 (NULL表示尚未歸還)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='借閱紀錄表';
+
+--
+-- 傾印資料表的資料 `borrowing_records`
+--
+
+INSERT INTO `borrowing_records` (`id`, `book_id`, `user_id`, `borrow_date`, `due_date`, `return_date`) VALUES
+(1, 4, 4, '2025-12-16 09:13:06', '2025-12-30 02:13:06', '2025-12-16 09:17:32'),
+(2, 19, 4, '2025-12-16 09:21:31', '2025-12-30 02:21:31', '2025-12-16 09:24:08');
+
+-- --------------------------------------------------------
+
+--
+-- 資料表結構 `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL COMMENT '使用者唯一ID',
+  `username` varchar(50) NOT NULL COMMENT '使用者名稱 (登入用)',
+  `email` varchar(100) NOT NULL COMMENT '電子郵件',
+  `password` varchar(255) NOT NULL COMMENT '密碼 (需加密儲存)',
+  `role` enum('user','admin') NOT NULL DEFAULT 'user' COMMENT '使用者角色 (user/admin)',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT '註冊時間'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='使用者帳號表';
+
+--
+-- 傾印資料表的資料 `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `created_at`) VALUES
+(3, 'yu', '1091361@gm.hnvs.cy.edu.tw', '$2y$10$rsD63Dwv70lZfQzb6JYo/ejVy70VgU/8y5iXetqmLnISiLXRSLooG', 'admin', '2025-12-16 08:56:18'),
+(4, 'wu', '227@nkust.edu.tw', '$2y$10$1HbFIh5KDNoTOFSXeFmzD.xyaSW1Uopwld.snoxBy.1neLEWWsSma', 'user', '2025-12-16 09:04:19');
+
 --
 -- 已傾印資料表的索引
 --
@@ -77,6 +123,22 @@ ALTER TABLE `books`
   ADD UNIQUE KEY `isbn` (`isbn`);
 
 --
+-- 資料表索引 `borrowing_records`
+--
+ALTER TABLE `borrowing_records`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `book_id` (`book_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- 資料表索引 `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
 -- 在傾印的資料表使用自動遞增(AUTO_INCREMENT)
 --
 
@@ -85,6 +147,29 @@ ALTER TABLE `books`
 --
 ALTER TABLE `books`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '書籍唯一ID', AUTO_INCREMENT=21;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `borrowing_records`
+--
+ALTER TABLE `borrowing_records`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '借閱紀錄唯一ID', AUTO_INCREMENT=3;
+
+--
+-- 使用資料表自動遞增(AUTO_INCREMENT) `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '使用者唯一ID', AUTO_INCREMENT=5;
+
+--
+-- 已傾印資料表的限制式
+--
+
+--
+-- 資料表的限制式 `borrowing_records`
+--
+ALTER TABLE `borrowing_records`
+  ADD CONSTRAINT `borrowing_records_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `borrowing_records_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
